@@ -51,7 +51,7 @@ class DailyLifeAdvisorCapability(MatchingCapability):
         
         # Get the user's feedback
         user_feedback = await self.capability_worker.user_response()
-        logging.info(f"User feedback: {user_feedback}")
+        self.worker.editor_logging_handler.info(f"User feedback: {user_feedback}")
 
         self.worker.use_final_transcript_event.clear()
 

@@ -1,9 +1,7 @@
 import asyncio
 import json
-import logging
 import os
 from src.agent.capability import MatchingCapability
-from src.agent.io_interface import SharedValue
 from src.main import AgentWorker
 from src.agent.capability_worker import CapabilityWorker
 
@@ -25,7 +23,7 @@ class DailyLifeAdvisorCapability(MatchingCapability):
             matching_hotwords=data["matching_hotwords"],
         )
 
-    async def give_advice(self, TTT: SharedValue):
+    async def give_advice(self):
         """
         The main function for giving advice to the user.
         It asks the user about their problem, provides a solution, and asks for feedback.
@@ -36,7 +34,7 @@ class DailyLifeAdvisorCapability(MatchingCapability):
         """
 
         # Introduce the advisor and ask for the user's problem
-        user_problem = await self.capability_worker.run_io_loop(INTRO_PROMPT, TTT)
+        user_problem = await self.capability_worker.run_io_loop(INTRO_PROMPT)
 
         # Generate a solution based on the problem
         solution_prompt = f"The user has the following problem: {user_problem}. Provide a helpful solution in just 1 or 2 sentences."
@@ -44,7 +42,7 @@ class DailyLifeAdvisorCapability(MatchingCapability):
 
         # Speak the solution and ask if the user is satisfied
         solution_with_feedback = solution + FEEDBACK_PROMPT
-        await self.capability_worker.speak(solution_with_feedback, TTT)
+        await self.capability_worker.speak(solution_with_feedback)
 
         self.worker.user_is_finished_speak_event.set()
         self.worker.use_final_transcript_event.set()
@@ -58,7 +56,7 @@ class DailyLifeAdvisorCapability(MatchingCapability):
         # Resume the normal workflow
         self.capability_worker.resume_normal_flow()
 
-    def call(self, worker: AgentWorker, interrupt_str: SharedValue):
+    def call(self, worker: AgentWorker):
         # Initialize the worker and capability worker
         self.worker = worker
         self.capability_worker = CapabilityWorker(self.worker)
@@ -67,4 +65,4 @@ class DailyLifeAdvisorCapability(MatchingCapability):
         self.worker.capability_event.set()
 
         # Start the advisor functionality
-        asyncio.create_task(self.give_advice(interrupt_str))
+        asyncio.create_task(self.give_advice())

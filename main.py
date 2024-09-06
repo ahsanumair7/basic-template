@@ -72,8 +72,5 @@ class DailyLifeAdvisorCapability(MatchingCapability):
         self.worker = worker
         self.capability_worker = CapabilityWorker(self.worker)
 
-        # Trigger the capability event
-        self.worker.capability_event.set()
-
         # Start the advisor functionality
         asyncio.create_task(self.give_advice())

@@ -73,4 +73,4 @@ class DailyLifeAdvisorCapability(MatchingCapability):
         self.capability_worker = CapabilityWorker(self.worker)
 
         # Start the advisor functionality
-        asyncio.create_task(self.give_advice())
+        self.worker.session_tasks.create(self.give_advice())
